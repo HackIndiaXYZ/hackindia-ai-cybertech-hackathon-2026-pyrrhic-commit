@@ -23,7 +23,8 @@ function runSetup() {
     fs.mkdirSync(ARTIFACTS_DIR, { recursive: true });
   }
 
-  const circomPath = 'c:\\Users\\chira\\bin\\circom.exe';
+  const circomPath = process.env.CIRCOM_PATH ||
+    (fs.existsSync('c:\\Users\\chira\\bin\\circom.exe') ? 'c:\\Users\\chira\\bin\\circom.exe' : 'circom');
   const circuitSrc = path.join(CIRCUITS_DIR, 'fsm_v1.circom');
   const r1csPath = path.join(BUILD_DIR, 'fsm_v1.r1cs');
   const wasmPath = path.join(BUILD_DIR, 'fsm_v1_js', 'fsm_v1.wasm');
@@ -32,7 +33,8 @@ function runSetup() {
   console.log('[1/5] Compiling fsm_v1.circom...');
   execSync(`"${circomPath}" "${circuitSrc}" --r1cs --wasm --sym -o "${BUILD_DIR}"`, { stdio: 'inherit' });
 
-  const snarkjsCmd = path.join(ROOT_DIR, 'node_modules', '.bin', 'snarkjs.cmd');
+  const snarkjsLocal = path.join(ROOT_DIR, 'node_modules', '.bin', process.platform === 'win32' ? 'snarkjs.cmd' : 'snarkjs');
+  const snarkjsCmd = fs.existsSync(snarkjsLocal) ? snarkjsLocal : 'snarkjs';
 
   const ptau0 = path.join(ARTIFACTS_DIR, 'pot10_0000.ptau');
   const ptau1 = path.join(ARTIFACTS_DIR, 'pot10_contrib.ptau');
