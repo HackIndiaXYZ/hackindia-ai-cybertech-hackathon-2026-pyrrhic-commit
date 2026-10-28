@@ -10,8 +10,30 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
-const { executeScenario, FSM_TRANSITIONS, STATE_NAMES, getAuthorityKeypair } = require('./simulation/pipeline');
+const { ActionEnforcer, PolicyGate } = require('./enforcement/boundary');
+const { FSM_TRANSITIONS, STATE_NAMES } = require('./enforcement/constants');
+const { executeScenario, getAuthorityKeypair } = require('./simulation/pipeline');
 const { verifyResponse, getFileHash, DEFAULT_MANIFEST_PATH, DEFAULT_VKEY_PATH } = require('./zk/verifier');
+
+// Global action enforcer instance with standard handlers registered
+const globalEnforcer = new ActionEnforcer({
+  policyGate: new PolicyGate({ policyVersion: 'fsm-v1', transitions: FSM_TRANSITIONS }),
+  authorityKeypair: getAuthorityKeypair()
+});
+
+// Register standard simulated tool handlers
+globalEnforcer.registerHandler(1, async (req) => {
+  return { action: 'BLOCK_IP', target: req.target_id, timestamp: Date.now(), rule: 'DROP' };
+});
+globalEnforcer.registerHandler(2, async (req) => {
+  return { action: 'ROTATE_CREDENTIAL', target: req.target_id, timestamp: Date.now(), status: 'ROTATED' };
+});
+globalEnforcer.registerHandler(3, async (req) => {
+  return { action: 'ISOLATE_SERVICE', target: req.target_id, timestamp: Date.now(), networkState: 'QUARANTINED' };
+});
+globalEnforcer.registerHandler(4, async (req) => {
+  return { action: 'CONFIRM_CONTAINMENT', target: req.target_id, timestamp: Date.now(), confirmed: true };
+});
 
 const PORT = process.env.PORT || 3000;
 const FRONTEND_DIST = path.resolve(__dirname, '../frontend/dist');
@@ -78,7 +100,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // --- API Endpoints ---
-  if (pathname === '/api/status' && req.method === 'GET') {
+  if ((pathname === '/api/status' || pathname === '/api/specs') && req.method === 'GET') {
     const manifestHash = getFileHash(DEFAULT_MANIFEST_PATH);
     const vkeyHash = getFileHash(DEFAULT_VKEY_PATH);
     const authorityKeys = getAuthorityKeypair();
@@ -102,7 +124,26 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
-  if (pathname === '/api/run' && req.method === 'POST') {
+  if (pathname === '/api/health' && req.method === 'GET') {
+    return sendJson(res, 200, {
+      status: 'UP',
+      timestamp: new Date().toISOString(),
+      policy_version: 'fsm-v1'
+    });
+  }
+
+  if (pathname === '/api/enforce' && req.method === 'POST') {
+    try {
+      const request = await parseJsonBody(req);
+      const result = await globalEnforcer.execute(request);
+      const statusCode = result.decision === 'ALLOW' ? 200 : 403;
+      return sendJson(res, statusCode, result);
+    } catch (err) {
+      return sendJson(res, 500, { error: err.message });
+    }
+  }
+
+  if ((pathname === '/api/run' || pathname === '/api/scenario') && req.method === 'POST') {
     try {
       const body = await parseJsonBody(req);
       const scenario = body.scenario || 'happy_path';

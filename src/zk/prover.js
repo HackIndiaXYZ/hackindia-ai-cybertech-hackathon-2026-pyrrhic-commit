@@ -58,7 +58,30 @@ async function generateFsmProof(runId, actionCodes, paths = {}) {
   };
 }
 
+/**
+ * Check if the required Circom/snarkjs proving artifacts (WASM & zkey) exist on disk.
+ * 
+ * @param {object} [paths] - Optional custom wasm and zkey paths
+ * @returns {{ available: boolean, wasmPath: string, zkeyPath: string, missing: string[] }}
+ */
+function checkProverArtifacts(paths = {}) {
+  const wasmPath = paths.wasmPath || DEFAULT_WASM_PATH;
+  const zkeyPath = paths.zkeyPath || DEFAULT_ZKEY_PATH;
+  const missing = [];
+
+  if (!fs.existsSync(wasmPath)) missing.push(`WASM (${wasmPath})`);
+  if (!fs.existsSync(zkeyPath)) missing.push(`ZKey (${zkeyPath})`);
+
+  return {
+    available: missing.length === 0,
+    wasmPath,
+    zkeyPath,
+    missing
+  };
+}
+
 module.exports = {
+  checkProverArtifacts,
   generateFsmProof,
   DEFAULT_WASM_PATH,
   DEFAULT_ZKEY_PATH

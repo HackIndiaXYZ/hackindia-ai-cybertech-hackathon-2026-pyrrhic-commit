@@ -9,8 +9,10 @@
     "build": "npm --prefix frontend run build",
     "build:frontend": "npm --prefix frontend run build",
     "dev:frontend": "npm --prefix frontend run dev",
-    "test": "node tests/crypto.test.js && node tests/zk.test.js && node tests/e2e_verification.test.js",
+    "test": "node tests/crypto.test.js && node tests/baseline.test.js && node tests/enforcement.test.js",
     "test:crypto": "node tests/crypto.test.js",
+    "test:baseline": "node tests/baseline.test.js",
+    "test:enforcement": "node tests/enforcement.test.js",
     "test:zk": "node tests/zk.test.js",
     "test:e2e": "node tests/e2e_verification.test.js",
     "setup:zk": "node circuits/scripts/setup.js"

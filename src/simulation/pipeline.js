@@ -9,26 +9,12 @@
  * - Presentation layer consumes only raw verifier reports.
  */
 
+const { FSM_TRANSITIONS, STATE_NAMES } = require('../enforcement/constants');
 const { generateKeyPair, signReceipt } = require('../crypto/evidence');
 const { computeSequenceCommitment } = require('../zk/poseidon');
-const { generateFsmProof } = require('../zk/prover');
+const { generateFsmProof, checkProverArtifacts } = require('../zk/prover');
 const { verifyResponse, getFileHash, DEFAULT_MANIFEST_PATH } = require('../zk/verifier');
-
-// Frozen FSM transitions according to PROTOCOL_AND_CONTRACTS.md
-const FSM_TRANSITIONS = {
-  1: { id: 'BLOCK_IP', name: 'Block Malicious IP', from: 0, to: 1, allowedTargets: ['SRC-DEMO-01', 'SRC-DEMO-02'] },
-  2: { id: 'ROTATE_CREDENTIAL', name: 'Rotate Compromised Credential', from: 1, to: 2, allowedTargets: ['CRED-DEMO-01', 'CRED-DEMO-02'] },
-  3: { id: 'ISOLATE_SERVICE', name: 'Isolate Impacted Service', from: 2, to: 3, allowedTargets: ['SVC-DEMO-01', 'SVC-DEMO-02'] },
-  4: { id: 'CONFIRM_CONTAINMENT', name: 'Confirm System Containment', from: 3, to: 4, allowedTargets: ['CONTAINMENT-CHECK'] }
-};
-
-const STATE_NAMES = {
-  0: 'DETECTED',
-  1: 'IP_BLOCKED',
-  2: 'CREDENTIAL_ROTATED',
-  3: 'SERVICE_ISOLATED',
-  4: 'CONTAINED'
-};
+const { PolicyGate } = require('../enforcement/boundary');
 
 // Internal keypair for the mock evidence authority
 let mockAuthorityKeypair = null;
@@ -40,36 +26,19 @@ function getAuthorityKeypair() {
   return mockAuthorityKeypair;
 }
 
+// Shared PolicyGate instance
+const globalPolicyGate = new PolicyGate({ policyVersion: 'fsm-v1', transitions: FSM_TRANSITIONS });
+
 /**
  * Policy Gate Check
  */
 function evaluatePolicyGate(currentState, actionCode, targetId) {
-  const transition = FSM_TRANSITIONS[actionCode];
-  if (!transition) {
-    return {
-      decision: 'DENIED',
-      reason: `Unknown action code: ${actionCode}`
-    };
-  }
-
-  if (currentState !== transition.from) {
-    return {
-      decision: 'DENIED',
-      reason: `Invalid state transition: Action ${transition.id} requires state ${STATE_NAMES[transition.from]} (${transition.from}), but current state is ${STATE_NAMES[currentState]} (${currentState})`
-    };
-  }
-
-  if (!transition.allowedTargets.includes(targetId)) {
-    return {
-      decision: 'DENIED',
-      reason: `Target ${targetId} is not authorized for action ${transition.id}`
-    };
-  }
-
-  return {
-    decision: 'ALLOW',
-    transition
+  const req = {
+    action_code: actionCode,
+    target_id: targetId,
+    policy_version: 'fsm-v1'
   };
+  return globalPolicyGate.evaluate(currentState, req);
 }
 
 /**
@@ -192,15 +161,34 @@ async function executeScenario(scenarioType = 'happy_path', customParams = {}) {
   const commitment = await computeSequenceCommitment(runId, [1, 2, 3, 4]);
   log('ZK_PROVER', `Poseidon commitment: ${commitment.slice(0, 16)}...`);
 
-  log('ZK_PROVER', 'Generating Groth16 zero-knowledge proof using circuits/artifacts/fsm_v1.zkey...');
-  const proofStartTime = Date.now();
-  let proofData = await generateFsmProof(runId, [1, 2, 3, 4]);
-  const proofDuration = Date.now() - proofStartTime;
-  log('ZK_PROVER', `Groth16 proof generated in ${proofDuration}ms. Public signals: [${proofData.publicSignals.join(', ')}]`);
+  let proofData = null;
+  let proofDuration = 0;
+  const artifactCheck = checkProverArtifacts();
+
+  if (artifactCheck.available) {
+    log('ZK_PROVER', 'Generating Groth16 zero-knowledge proof using circuits/artifacts/fsm_v1.zkey...');
+    const proofStartTime = Date.now();
+    try {
+      proofData = await generateFsmProof(runId, [1, 2, 3, 4]);
+      proofDuration = Date.now() - proofStartTime;
+      log('ZK_PROVER', `Groth16 proof generated in ${proofDuration}ms. Public signals: [${proofData.publicSignals.join(', ')}]`);
+    } catch (err) {
+      log('ZK_PROVER', `Proof generation error: ${err.message}`, 'error');
+      proofData = { status: 'ERROR', details: `Proof generation error: ${err.message}`, commitment };
+    }
+  } else {
+    log('ZK_PROVER', `Proving artifacts missing: ${artifactCheck.missing.join(', ')}. Proof generation skipped (NOT_RUN).`, 'warn');
+    proofData = {
+      status: 'NOT_RUN',
+      reason: 'PROVING_ARTIFACTS_MISSING',
+      details: `Proving artifacts not found on disk: ${artifactCheck.missing.join(', ')}`,
+      commitment
+    };
+  }
 
   // Handle Adversarial Scenarios
   let receiptsForVerification = JSON.parse(JSON.stringify(receipts));
-  let proofForVerification = JSON.parse(JSON.stringify(proofData));
+  let proofForVerification = proofData ? JSON.parse(JSON.stringify(proofData)) : null;
 
   if (scenarioType === 'tampered_receipt') {
     log('ADVERSARY', 'Injecting tamper fault: modifying target_id of receipt #2 after signature emission', 'warn');
@@ -211,10 +199,22 @@ async function executeScenario(scenarioType = 'happy_path', customParams = {}) {
   } else if (scenarioType === 'replay_attack') {
     const foreignRunId = '99999999999999999999';
     log('ADVERSARY', `Injecting replay attack: generating valid proof for foreign run ${foreignRunId} and presenting with current receipts`, 'warn');
-    proofForVerification = await generateFsmProof(foreignRunId, [1, 2, 3, 4]);
+    if (artifactCheck.available) {
+      try {
+        proofForVerification = await generateFsmProof(foreignRunId, [1, 2, 3, 4]);
+      } catch (err) {
+        log('ADVERSARY', `Replay proof generation failed: ${err.message}`, 'error');
+        proofForVerification = { status: 'ERROR', details: err.message };
+      }
+    } else {
+      log('ADVERSARY', 'Replay proof generation skipped: artifacts missing', 'warn');
+      proofForVerification = { status: 'NOT_RUN', reason: 'PROVING_ARTIFACTS_MISSING' };
+    }
   } else if (scenarioType === 'tampered_proof') {
     log('ADVERSARY', 'Injecting proof fault: altering public input commitment signal', 'warn');
-    proofForVerification.publicSignals[1] = '123456789012345678901234567890';
+    if (proofForVerification && proofForVerification.publicSignals) {
+      proofForVerification.publicSignals[1] = '123456789012345678901234567890';
+    }
   }
 
   // 5. Independent Verification

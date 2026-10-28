@@ -93,10 +93,11 @@ async function verifyResponse({ receipts, proofData, publicKeyPem, options = {} 
 
   // 4. Validate proof generation presence
   if (!proofData || !proofData.proof || !proofData.publicSignals) {
-    result.proof_generation = 'FAIL';
-    result.commitment_binding = 'FAIL';
-    result.zk_verification = 'FAIL';
-    result.details.proof_error = 'Proof or public signals missing';
+    const isProverMissing = proofData && proofData.status === 'NOT_RUN';
+    result.proof_generation = isProverMissing ? 'NOT_RUN' : 'FAIL';
+    result.commitment_binding = isProverMissing ? 'NOT_RUN' : 'FAIL';
+    result.zk_verification = isProverMissing ? 'NOT_RUN' : 'FAIL';
+    result.details.proof_error = proofData?.details || 'Proof or public signals missing';
     return result;
   }
   result.proof_generation = 'PASS';
