@@ -36,6 +36,7 @@ globalEnforcer.registerHandler(4, async (req) => {
 });
 
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '127.0.0.1';
 const FRONTEND_DIST = path.resolve(__dirname, '../frontend/dist');
 const FALLBACK_PUBLIC = path.resolve(__dirname, '../public');
 
@@ -212,10 +213,10 @@ const server = http.createServer(async (req, res) => {
 });
 
 if (require.main === module) {
-  server.listen(PORT, () => {
+  server.listen(PORT, HOST, () => {
     console.log(`\n======================================================`);
     console.log(`  VeriRespond Security & ZK Dashboard Server Running`);
-    console.log(`  URL: http://localhost:${PORT}`);
+    console.log(`  Host: ${HOST} | Port: ${PORT}`);
     console.log(`  Policy Version: fsm-v1 | Groth16 Prover: Active`);
     console.log(`======================================================\n`);
   });

@@ -77,8 +77,8 @@ async function verifyResponse({ receipts, proofData, publicKeyPem, options = {} 
   result.policy_check = policyOk ? 'PASS' : 'FAIL';
   result.execution_check = execOk ? 'PASS' : 'FAIL';
 
-  // 3. Validate receipt signatures and hash chain
-  const chainResult = validateReceiptChain(receipts, publicKeyPem, runId);
+  // 3. Validate receipt signatures and hash chain (require complete 4-step sequence for FSM v1)
+  const chainResult = validateReceiptChain(receipts, publicKeyPem, runId, { expectedCount: 4 });
   if (chainResult.valid) {
     result.receipt_signatures = 'PASS';
     result.hash_chain = 'PASS';

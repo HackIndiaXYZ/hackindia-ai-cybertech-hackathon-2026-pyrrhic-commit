@@ -32,6 +32,17 @@ class PolicyGate {
       return { decision: 'DENIED', reason: 'Malformed action request: expected object' };
     }
 
+    // Enforce strict known fields validation
+    const allowedKeys = new Set(['schema_version', 'run_id', 'incident_id', 'policy_version', 'action_id', 'action_code', 'target_id', 'request_id', 'sequence']);
+    for (const key of Object.keys(request)) {
+      if (!allowedKeys.has(key)) {
+        return {
+          decision: 'DENIED',
+          reason: `Unexpected or unauthorized request parameter: '${key}'`
+        };
+      }
+    }
+
     const { action_id, action_code, target_id, policy_version } = request;
 
     if (policy_version && policy_version !== this.policyVersion) {
@@ -98,6 +109,7 @@ class ActionEnforcer {
     this.processedRequests = new Map(); // requestId -> execution record
     this.runStates = new Map(); // runId -> currentState (integer)
     this.runChains = new Map(); // runId -> previousReceiptHash
+    this.runLocks = new Map(); // runId -> Promise chain for sequential execution
   }
 
   /**
@@ -145,6 +157,24 @@ class ActionEnforcer {
         receipt: null
       };
     }
+
+    const { run_id } = request;
+
+    // Per-run lock to serialize concurrent requests and eliminate race conditions
+    const previousLock = this.runLocks.get(run_id) || Promise.resolve();
+    let releaseLock;
+    const currentLock = new Promise(resolve => { releaseLock = resolve; });
+    this.runLocks.set(run_id, previousLock.then(() => currentLock));
+
+    try {
+      await previousLock;
+      return await this._executeInternal(request, context);
+    } finally {
+      releaseLock();
+    }
+  }
+
+  async _executeInternal(request, context) {
 
     const { run_id, request_id } = request;
 

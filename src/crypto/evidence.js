@@ -115,10 +115,19 @@ function verifyReceiptSignature(receipt, publicKeyPem) {
  * 3. First previous_receipt_hash === 'GENESIS'
  * 4. Chained previous_receipt_hash === preceding receipt_hash
  * 5. Signatures and individual hashes valid against publicKeyPem
+ * 6. (Optional) Check expected total sequence count to reject incomplete/truncated runs
  */
-function validateReceiptChain(receipts, publicKeyPem, expectedRunId = null) {
+function validateReceiptChain(receipts, publicKeyPem, expectedRunId = null, options = {}) {
   if (!Array.isArray(receipts) || receipts.length === 0) {
     return { valid: false, error: 'Receipts must be a non-empty array' };
+  }
+
+  const expectedTotalCount = options.expectedCount || null;
+  if (expectedTotalCount !== null && receipts.length !== expectedTotalCount) {
+    return {
+      valid: false,
+      error: `Incomplete receipt chain: expected ${expectedTotalCount} receipts, but got ${receipts.length}`
+    };
   }
 
   let previousHash = 'GENESIS';

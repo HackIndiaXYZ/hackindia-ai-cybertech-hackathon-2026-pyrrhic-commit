@@ -9,6 +9,18 @@
   - Executed tests: `npm test` (crypto + baseline: 12/12 passed), `npm run test:crypto` (7/7 passed), `npm run build:frontend` (Vite bundle generated in 1.49s).
   - Created implementation continuity documents in `docs/implementation/`.
 
+## 2026-10-28 — Security Audit & Remediation (SEC-01 to SEC-05)
+- **Vulnerabilities Fixed:**
+  - SEC-01: Serialized per-run concurrent request execution in `src/enforcement/boundary.js`.
+  - SEC-02: Added strict key allowlist in `PolicyGate.evaluate()` to reject unexpected/injected parameters.
+  - SEC-03: Added expected total count validation in `validateReceiptChain()` and `verifyResponse()`.
+  - SEC-04: Persisted authority keypair to `data/authority_keypair.json` across restarts.
+  - SEC-05: Bound `server.listen()` strictly to loopback `127.0.0.1` by default.
+- **Tests Added & Verified:**
+  - `tests/security.test.js` added covering concurrent duplicate request race conditions, parameter pollution rejection, and truncated chain rejection.
+  - Full test suite: 28/28 tests passed across 6 test suites (`npm test`, `npm run test:zk`, `npm run test:e2e`).
+  - Created `docs/implementation/SECURITY_AUDIT.md` and `docs/implementation/SECURITY_REMEDIATION.md`.
+
 ## 2026-10-28 — Phase 5: Real Circom & Groth16 Proving Pipeline Completed
 - **Toolchain Setup:** Configured official `circom` compiler 2.1.9 (`~/.local/bin/circom`) and `snarkjs` 0.7.5.
 - **Circuit Compilation & Ceremony:**

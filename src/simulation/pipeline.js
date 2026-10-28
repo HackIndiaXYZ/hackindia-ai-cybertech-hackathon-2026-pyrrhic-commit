@@ -9,6 +9,8 @@
  * - Presentation layer consumes only raw verifier reports.
  */
 
+const fs = require('fs');
+const path = require('path');
 const { FSM_TRANSITIONS, STATE_NAMES } = require('../enforcement/constants');
 const { generateKeyPair, signReceipt } = require('../crypto/evidence');
 const { computeSequenceCommitment } = require('../zk/poseidon');
@@ -16,13 +18,43 @@ const { generateFsmProof, checkProverArtifacts } = require('../zk/prover');
 const { verifyResponse, getFileHash, DEFAULT_MANIFEST_PATH } = require('../zk/verifier');
 const { PolicyGate } = require('../enforcement/boundary');
 
+// Persistent keypair storage path
+const KEY_DIR = path.resolve(__dirname, '../../data');
+const KEY_PATH = path.join(KEY_DIR, 'authority_keypair.json');
+
 // Internal keypair for the mock evidence authority
 let mockAuthorityKeypair = null;
 
 function getAuthorityKeypair() {
-  if (!mockAuthorityKeypair) {
-    mockAuthorityKeypair = generateKeyPair();
+  if (mockAuthorityKeypair) {
+    return mockAuthorityKeypair;
   }
+
+  // Check persistent disk key
+  try {
+    if (fs.existsSync(KEY_PATH)) {
+      const saved = JSON.parse(fs.readFileSync(KEY_PATH, 'utf8'));
+      if (saved.publicKeyPem && saved.privateKeyPem) {
+        mockAuthorityKeypair = saved;
+        return mockAuthorityKeypair;
+      }
+    }
+  } catch (err) {
+    // Fall back to memory generation if read fails
+  }
+
+  mockAuthorityKeypair = generateKeyPair();
+
+  // Try saving keypair to data directory
+  try {
+    if (!fs.existsSync(KEY_DIR)) {
+      fs.mkdirSync(KEY_DIR, { recursive: true });
+    }
+    fs.writeFileSync(KEY_PATH, JSON.stringify(mockAuthorityKeypair, null, 2), { mode: 0o600 });
+  } catch (err) {
+    // Non-fatal if storage directory is read-only
+  }
+
   return mockAuthorityKeypair;
 }
 
