@@ -6,6 +6,11 @@
 **Track:** AI & CyberTech — Zero-Knowledge Evidence & Incident Containment  
 **Status:** Locally verified end-to-end implementation and luxury white React dashboard.
 
+## Live Deployments
+
+- **Live Application & Dashboard:** [https://hackindia-ai-cybertech-hackathon-2026-h9v8.onrender.com](https://hackindia-ai-cybertech-hackathon-2026-h9v8.onrender.com)
+- **Live API Status Endpoint:** [https://hackindia-ai-cybertech-hackathon-2026-h9v8.onrender.com/api/status](https://hackindia-ai-cybertech-hackathon-2026-h9v8.onrender.com/api/status)
+
 ---
 
 ## Read these documents in this order
