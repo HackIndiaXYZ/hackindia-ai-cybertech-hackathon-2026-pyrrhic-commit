@@ -132,6 +132,15 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
+  if (pathname === '/api/runs' && req.method === 'GET') {
+    try {
+      const runs = globalEnforcer.store.listRuns();
+      return sendJson(res, 200, { runs });
+    } catch (err) {
+      return sendJson(res, 500, { error: err.message });
+    }
+  }
+
   if (pathname === '/api/enforce' && req.method === 'POST') {
     try {
       const request = await parseJsonBody(req);

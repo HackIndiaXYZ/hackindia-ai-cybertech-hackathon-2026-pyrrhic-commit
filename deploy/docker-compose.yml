@@ -1,0 +1,23 @@
+services:
+  verirespond-connector:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: verirespond-enforcement-connector
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+    volumes:
+      - verirespond_data:/app/data
+    security_opt:
+      - no-new-privileges:true
+    read_only: false
+    cap_drop:
+      - ALL
+
+volumes:
+  verirespond_data:
+    name: verirespond_durable_evidence

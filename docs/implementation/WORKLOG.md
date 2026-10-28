@@ -9,10 +9,27 @@
   - Executed tests: `npm test` (crypto + baseline: 12/12 passed), `npm run test:crypto` (7/7 passed), `npm run build:frontend` (Vite bundle generated in 1.49s).
   - Created implementation continuity documents in `docs/implementation/`.
 
-## 2026-10-28 — Phase 1: Real Action-Enforcement Boundary
+## 2026-10-28 — Phases 4 to 7: Deployment, Toolchain Audit, Dashboard, & Full Validation
 - **Files Created/Modified:**
-  - `src/enforcement/constants.js` — canonical FSM definitions and state codes.
-  - `src/enforcement/boundary.js` — `PolicyGate` and `ActionEnforcer` with strict target validation, registered execution handlers, and zero handler execution on denial.
-  - `src/server.js` — added `/api/enforce` endpoint mediating external action proposals.
-  - `tests/enforcement.test.js` — 5 unit tests for spy handler verification, out-of-order rejection, unauthorized target rejection, idempotency, and full canonical sequence execution.
-- **Test Results:** `npm test` passed 17/17 tests across crypto, baseline, and enforcement suites. Live HTTP verification on `/api/enforce` confirmed 403 on denial and 200 on authorized execution.
+  - `deploy/Dockerfile` — production multi-stage Alpine build running as unprivileged `appuser`.
+  - `deploy/docker-compose.yml` — loopback-isolated deployment (`127.0.0.1:3000`), dropped Linux capabilities, durable named volume.
+  - `deploy/README.md` — quickstart and hardening guide.
+  - `circuits/scripts/setup.js` — explicit pre-flight diagnostic for Circom compiler with clear manual guidance.
+  - Full regression test run: `npm test` runs 25 automated tests across 5 test suites.
+
+## 2026-10-28 — Phase 3: Node.js SDK & Reference Agent
+- **Files Created/Modified:**
+  - `packages/sdk/package.json` — standalone SDK package `@verirespond/sdk`.
+  - `packages/sdk/src/index.js` — typed client communicating with enforcement connector.
+  - `packages/sdk/src/index.d.ts` — TypeScript definitions.
+  - `packages/sdk/test/sdk.test.js` — unit and integration tests for SDK.
+  - `scripts/reference_agent.js` — end-to-end reference AI agent.
+- **Test Results:** `npm test` runs 25 tests across all suites, passing 25/25.
+
+## 2026-10-28 — Phase 2: Persistent Runs, Reliable Execution & Storage
+- **Files Created/Modified:**
+  - `src/storage/store.js` — atomic file-backed durable persistence (`runs.json`, `receipts.json`, `requests.json`).
+  - `src/enforcement/boundary.js` — integrated `DurableStore` for durable state restoration, persistent idempotency, and chained receipt retention.
+  - `src/server.js` — added `GET /api/runs` to inspect all persisted incident runs.
+  - `tests/storage.test.js` — tests crash recovery, restart state restoration, persistent idempotency, and hash chain validation across restarts.
+- **Test Results:** `npm test` passed 21/21 tests across all test suites.

@@ -1,12 +1,17 @@
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
 const { PolicyGate, ActionEnforcer } = require('../src/enforcement/boundary');
+const { DurableStore } = require('../src/storage/store');
 const { generateKeyPair, verifyReceiptSignature } = require('../src/crypto/evidence');
 
 async function runEnforcementTests() {
   console.log('=== Running Action Enforcement Boundary Tests ===');
 
   const keypair = generateKeyPair();
-  const enforcer = new ActionEnforcer({ authorityKeypair: keypair });
+  const testDir = path.resolve(__dirname, '../data_test_enf_' + Date.now());
+  const store = new DurableStore(testDir);
+  const enforcer = new ActionEnforcer({ store, authorityKeypair: keypair });
 
   // Track spy calls to verify zero execution on denial
   const spyCalls = { 1: 0, 2: 0, 3: 0, 4: 0 };
@@ -122,6 +127,7 @@ async function runEnforcementTests() {
   console.log('✓ Test 5 Passed: Full sequence successfully mediated through enforcement boundary');
 
   console.log('=== All Action Enforcement Boundary Tests Passed! ===\n');
+  fs.rmSync(testDir, { recursive: true, force: true });
 }
 
 runEnforcementTests().catch(err => {

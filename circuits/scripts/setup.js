@@ -29,6 +29,15 @@ function runSetup() {
   const r1csPath = path.join(BUILD_DIR, 'fsm_v1.r1cs');
   const wasmPath = path.join(BUILD_DIR, 'fsm_v1_js', 'fsm_v1.wasm');
 
+  // Verify circom compiler availability
+  try {
+    execSync(`"${circomPath}" --version`, { stdio: 'ignore' });
+  } catch {
+    console.error(`\n[BLOCKED] Circom compiler binary ('${circomPath}') not found in environment.`);
+    console.error('Please install Circom 2 (https://docs.circom.io/getting-started/installation/) or provide precompiled fsm_v1.wasm and fsm_v1_final.zkey.\n');
+    process.exit(1);
+  }
+
   // 1. Compile circuit if not already compiled
   console.log('[1/5] Compiling fsm_v1.circom...');
   execSync(`"${circomPath}" "${circuitSrc}" --r1cs --wasm --sym -o "${BUILD_DIR}"`, { stdio: 'inherit' });

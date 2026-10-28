@@ -1,0 +1,13 @@
+{
+  "name": "@verirespond/sdk",
+  "version": "1.0.0",
+  "description": "VeriRespond Node.js client SDK for policy-enforced AI incident response",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "scripts": {
+    "test": "node test/sdk.test.js"
+  },
+  "keywords": ["security", "ai-safety", "incident-response", "enforcement", "zk"],
+  "author": "Pyrrhic Commit",
+  "license": "ISC"
+}

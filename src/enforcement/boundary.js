@@ -12,6 +12,7 @@
 
 const { FSM_TRANSITIONS, STATE_NAMES } = require('./constants');
 const { signReceipt } = require('../crypto/evidence');
+const { DurableStore } = require('../storage/store');
 
 class PolicyGate {
   constructor(options = {}) {
@@ -92,6 +93,7 @@ class ActionEnforcer {
   constructor(options = {}) {
     this.policyGate = options.policyGate || new PolicyGate();
     this.authorityKeypair = options.authorityKeypair;
+    this.store = options.store || new DurableStore();
     this.handlers = new Map();
     this.processedRequests = new Map(); // requestId -> execution record
     this.runStates = new Map(); // runId -> currentState (integer)
@@ -115,7 +117,16 @@ class ActionEnforcer {
    * Get current state of a run
    */
   getRunState(runId) {
-    return this.runStates.has(runId) ? this.runStates.get(runId) : 0; // Default state 0: DETECTED
+    if (this.runStates.has(runId)) {
+      return this.runStates.get(runId);
+    }
+    // Check durable store
+    const persisted = this.store ? this.store.getRun(runId) : null;
+    if (persisted && persisted.state !== undefined) {
+      this.runStates.set(runId, persisted.state);
+      return persisted.state;
+    }
+    return 0; // Default state 0: DETECTED
   }
 
   /**
@@ -138,8 +149,8 @@ class ActionEnforcer {
     const { run_id, request_id } = request;
 
     // Idempotency check: prevent duplicate replay of identical request_id
-    if (this.processedRequests.has(request_id)) {
-      const existing = this.processedRequests.get(request_id);
+    const existing = this.processedRequests.get(request_id) || (this.store ? this.store.getRequest(request_id) : null);
+    if (existing) {
       return {
         ...existing,
         isDuplicate: true,
@@ -168,6 +179,9 @@ class ActionEnforcer {
         receipt: null,
         timestamp: new Date().toISOString()
       };
+      if (this.store) {
+        this.store.recordRequest(request_id, denialRecord);
+      }
       this.processedRequests.set(request_id, denialRecord);
       return denialRecord;
     }
@@ -213,11 +227,22 @@ class ActionEnforcer {
 
     // Mutate state only after successful handler execution
     this.runStates.set(run_id, stateAfter);
+    if (this.store) {
+      this.store.saveRun(run_id, { state: stateAfter, last_action: transition.id });
+    }
 
     // 4. Evidence Receipt Generation
     let signedReceipt = null;
     if (this.authorityKeypair && this.authorityKeypair.privateKeyPem) {
-      const previousHash = this.runChains.get(run_id) || 'GENESIS';
+      let previousHash = this.runChains.get(run_id);
+      if (!previousHash && this.store) {
+        const storedReceipts = this.store.getReceipts(run_id);
+        if (storedReceipts.length > 0) {
+          previousHash = storedReceipts[storedReceipts.length - 1].receipt_hash;
+        }
+      }
+      if (!previousHash) previousHash = 'GENESIS';
+
       const sequence = (request.sequence !== undefined) ? request.sequence : (stateBefore + 1);
 
       const rawReceipt = {
@@ -239,6 +264,9 @@ class ActionEnforcer {
 
       signedReceipt = signReceipt(rawReceipt, this.authorityKeypair.privateKeyPem);
       this.runChains.set(run_id, signedReceipt.receipt_hash);
+      if (this.store) {
+        this.store.saveReceipt(run_id, signedReceipt);
+      }
     }
 
     const successRecord = {
@@ -253,6 +281,9 @@ class ActionEnforcer {
       outcome: executionOutcome
     };
 
+    if (this.store) {
+      this.store.recordRequest(request_id, successRecord);
+    }
     this.processedRequests.set(request_id, successRecord);
     return successRecord;
   }

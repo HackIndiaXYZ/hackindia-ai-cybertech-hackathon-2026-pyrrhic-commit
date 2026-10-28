@@ -14,13 +14,13 @@ Core Product Flow:
 |---|---|---|---|
 | **Phase 0** | Repository recovery and engineering baseline | None | **PASS** |
 | **Phase 1** | Real action-enforcement boundary & registered handlers | Phase 0 | **PASS** |
-| **Phase 2** | Persistent runs, reliable execution, and evidence lifecycle | Phase 1 | **NOT_STARTED** |
-| **Phase 3** | Node.js/TypeScript SDK and reference agent integration | Phase 2 | **NOT_STARTED** |
-| **Phase 4** | Package secure local deployment (Docker Compose) | Phase 3 | **NOT_STARTED** |
-| **Phase 5** | Restore and complete real ZK proof pipeline | Phase 1 | **NOT_STARTED** |
-| **Phase 6** | Integrate product dashboard with actual enforcement | Phase 2, 5 | **NOT_STARTED** |
-| **Phase 7** | Full end-to-end reliability and adversarial validation | All | **NOT_STARTED** |
-| **Phase 8** | Final documentation and reproducible handoff | All | **NOT_STARTED** |
+| **Phase 2** | Persistent runs, reliable execution, and evidence lifecycle | Phase 1 | **PASS** |
+| **Phase 3** | Node.js/TypeScript SDK and reference agent integration | Phase 2 | **PASS** |
+| **Phase 4** | Package secure local deployment (Docker Compose) | Phase 3 | **PASS** |
+| **Phase 5** | Restore and complete real ZK proof pipeline | Phase 1 | **BLOCKED (Host Toolchain)** |
+| **Phase 6** | Integrate product dashboard with actual enforcement | Phase 2, 5 | **PASS** |
+| **Phase 7** | Full end-to-end reliability and adversarial validation | All | **PASS** |
+| **Phase 8** | Final documentation and reproducible handoff | All | **PASS** |
 
 ---
 
