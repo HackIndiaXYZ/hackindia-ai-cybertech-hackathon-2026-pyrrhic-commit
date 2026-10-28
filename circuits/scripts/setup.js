@@ -23,8 +23,10 @@ function runSetup() {
     fs.mkdirSync(ARTIFACTS_DIR, { recursive: true });
   }
 
+  const userLocalCircom = path.join(process.env.HOME || '', '.local/bin/circom');
   const circomPath = process.env.CIRCOM_PATH ||
-    (fs.existsSync('c:\\Users\\chira\\bin\\circom.exe') ? 'c:\\Users\\chira\\bin\\circom.exe' : 'circom');
+    (fs.existsSync(userLocalCircom) ? userLocalCircom :
+    (fs.existsSync('c:\\Users\\chira\\bin\\circom.exe') ? 'c:\\Users\\chira\\bin\\circom.exe' : 'circom'));
   const circuitSrc = path.join(CIRCUITS_DIR, 'fsm_v1.circom');
   const r1csPath = path.join(BUILD_DIR, 'fsm_v1.r1cs');
   const wasmPath = path.join(BUILD_DIR, 'fsm_v1_js', 'fsm_v1.wasm');

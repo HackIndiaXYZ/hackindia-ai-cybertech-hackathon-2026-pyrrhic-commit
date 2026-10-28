@@ -9,6 +9,19 @@
   - Executed tests: `npm test` (crypto + baseline: 12/12 passed), `npm run test:crypto` (7/7 passed), `npm run build:frontend` (Vite bundle generated in 1.49s).
   - Created implementation continuity documents in `docs/implementation/`.
 
+## 2026-10-28 — Phase 5: Real Circom & Groth16 Proving Pipeline Completed
+- **Toolchain Setup:** Configured official `circom` compiler 2.1.9 (`~/.local/bin/circom`) and `snarkjs` 0.7.5.
+- **Circuit Compilation & Ceremony:**
+  - Compiled `circuits/fsm_v1.circom` with 309 non-linear constraints and 75 template instances.
+  - Generated R1CS, symbol file, and WASM witness calculator (`circuits/build/fsm_v1_js/fsm_v1.wasm`).
+  - Executed Powers of Tau ceremony and Groth16 phase 2 setup; generated `fsm_v1_final.zkey` and `fsm_v1.vkey.json`.
+  - Updated cryptographic provenance manifest (`circuits/artifacts/manifest.json`).
+- **Tests Executed & Verified:**
+  - `npm run test:zk`: 4/4 tests passed (valid Groth16 proof generation and verification, invalid transition constraint failure rejection, tampered public inputs rejection, tampered proof points rejection).
+  - `npm run test:e2e`: 5/5 scenarios passed (valid 4-receipt chain + Groth16 proof full PASS, receipt payload tampering rejection, missing receipt rejection, cross-run replay binding failure, tampered public input rejection).
+  - `npm test`: 25/25 automated tests passed across all suites.
+  - Live HTTP `/api/scenario` verification: returns all 7 gates `PASS`.
+
 ## 2026-10-28 — Phases 4 to 7: Deployment, Toolchain Audit, Dashboard, & Full Validation
 - **Files Created/Modified:**
   - `deploy/Dockerfile` — production multi-stage Alpine build running as unprivileged `appuser`.

@@ -17,7 +17,7 @@ Core Product Flow:
 | **Phase 2** | Persistent runs, reliable execution, and evidence lifecycle | Phase 1 | **PASS** |
 | **Phase 3** | Node.js/TypeScript SDK and reference agent integration | Phase 2 | **PASS** |
 | **Phase 4** | Package secure local deployment (Docker Compose) | Phase 3 | **PASS** |
-| **Phase 5** | Restore and complete real ZK proof pipeline | Phase 1 | **BLOCKED (Host Toolchain)** |
+| **Phase 5** | Restore and complete real ZK proof pipeline | Phase 1 | **PASS** |
 | **Phase 6** | Integrate product dashboard with actual enforcement | Phase 2, 5 | **PASS** |
 | **Phase 7** | Full end-to-end reliability and adversarial validation | All | **PASS** |
 | **Phase 8** | Final documentation and reproducible handoff | All | **PASS** |

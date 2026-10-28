@@ -15,21 +15,21 @@
     },
     "r1cs": {
       "path": "circuits/build/fsm_v1.r1cs",
-      "sha256": "687d640402ea709e0afd7ddb8f45fde12d00c2e786a903de0a8a8e2afe485ef5"
+      "sha256": "d8bb6b7d4872a68fc9b3ca496fcd533f910fc42936b243405291cc9e72853c29"
     },
     "wasm": {
       "path": "circuits/build/fsm_v1_js/fsm_v1.wasm",
-      "sha256": "bd28996325a9f00e133935f48763c69568b3c9a644c4fce7ccb0826f7e627b6c"
+      "sha256": "605914ff68435043a7d71d9600f03355f641e1667aa3d5af2060d3ba69b84ad0"
     },
     "verification_key": {
       "path": "circuits/artifacts/fsm_v1.vkey.json",
-      "sha256": "146c00260330dcba21775c669a3b3778fa5c40b5ab92d62c5d4237cb4de7ad34"
+      "sha256": "623ce651967b1c68ee4699b1a92643c08653aa26683d5413cabcd4bdb5cfff02"
     },
     "zkey_final": {
       "path": "circuits/artifacts/fsm_v1_final.zkey",
-      "sha256": "e7106aee9e2bfbb6cd407107aeae6bd5c8fba308fe01193a9e0b5af9642eb74e"
+      "sha256": "da6590fb25e9f259d8723dcd879a4a9e8f395748d9dd24039a27920e4cf72b53"
     }
   },
-  "timestamp": "2026-10-28T04:59:50.525Z",
+  "timestamp": "2026-10-28T10:39:51.362Z",
   "demo_notice": "Generated for HackIndia 2026 hackathon demo/testing. Not a production trusted ceremony."
 }

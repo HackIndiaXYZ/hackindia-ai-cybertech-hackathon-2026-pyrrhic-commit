@@ -50,6 +50,7 @@ async function runBaselineTests() {
   console.log('✓ Test 5 Passed: Broken chain properly detected and marked FAIL');
 
   console.log('=== All Baseline Tests Succeeded! ===\n');
+  process.exit(0);
 }
 
 runBaselineTests().catch(err => {

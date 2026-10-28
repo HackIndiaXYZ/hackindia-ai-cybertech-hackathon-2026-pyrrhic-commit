@@ -62,6 +62,7 @@ async function runStorageTests() {
   // Cleanup test directory
   fs.rmSync(testDir, { recursive: true, force: true });
   console.log('=== All Storage & Recovery Tests Passed! ===\n');
+  process.exit(0);
 }
 
 runStorageTests().catch(err => {

@@ -128,6 +128,7 @@ async function runEnforcementTests() {
 
   console.log('=== All Action Enforcement Boundary Tests Passed! ===\n');
   fs.rmSync(testDir, { recursive: true, force: true });
+  process.exit(0);
 }
 
 runEnforcementTests().catch(err => {
