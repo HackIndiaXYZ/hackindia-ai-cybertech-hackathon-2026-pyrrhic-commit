@@ -1,0 +1,6 @@
+# Ignore root server & circuit files for Vercel static deployment
+index.js
+src/
+circuits/
+tests/
+scripts/
