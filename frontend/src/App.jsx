@@ -77,6 +77,8 @@ const FSM_STEPS = [
   { id: 4, codeName: 'CONTAINED', action: 'CONFIRM' }
 ];
 
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+
 function truncateMiddle(str, front = 6, back = 6) {
   if (!str) return '—';
   if (str.length <= front + back + 3) return str;
@@ -99,7 +101,7 @@ export default function App() {
     setBackendStatus('connecting');
     setApiError(null);
     try {
-      const res = await fetch('/api/status');
+      const res = await fetch(`${API_BASE}/api/status`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setSystemMeta(data);
@@ -134,7 +136,7 @@ export default function App() {
     setSelectedScenario(scenarioId);
 
     try {
-      const res = await fetch('/api/run', {
+      const res = await fetch(`${API_BASE}/api/run`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ scenario: scenarioId })
