@@ -1,0 +1,30 @@
+{
+  "name": "verirespond-hackindia-2026",
+  "version": "1.0.0",
+  "description": "**Project:** VeriRespond — evidence-grounded, policy-constrained AI incident response  \r **Team:** Pyrrhic Commit — Mohd Asif and Chirag Vishnoi  \r **Event context:** HackIndia AI & CyberTech Hackathon 2026  \r **Status:** Build specification; implementation and test claims must be updated only after they are actually verified.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node tests/crypto.test.js && node tests/zk.test.js && node tests/e2e_verification.test.js",
+    "test:crypto": "node tests/crypto.test.js",
+    "test:zk": "node tests/zk.test.js",
+    "test:e2e": "node tests/e2e_verification.test.js",
+    "setup:zk": "node circuits/scripts/setup.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohdasif-v1/verirespond-hackindia-2026.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mohdasif-v1/verirespond-hackindia-2026/issues"
+  },
+  "homepage": "https://github.com/mohdasif-v1/verirespond-hackindia-2026#readme",
+  "dependencies": {
+    "circomlib": "^2.0.5",
+    "circomlibjs": "^0.1.7",
+    "snarkjs": "^0.7.5"
+  }
+}
