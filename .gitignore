@@ -1,8 +1,10 @@
-# Node
+# Node & Dependencies
 node_modules/
+**/node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-store
 
 # Circom / snarkjs artifacts not meant for Git
 *.wtns
@@ -20,6 +22,7 @@ circuits/build/
 *.secret
 .env
 .env.*
+!.env.example
 
 # Python
 __pycache__/
@@ -35,3 +38,10 @@ Thumbs.db
 .vscode/
 .idea/
 bin/
+
+# Build caches & temp files
+.cache/
+.vite/
+vite.config.js.timestamp-*
+dist/
+dist-ssr/

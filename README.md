@@ -1,9 +1,12 @@
-# VeriRespond — Project Control Pack
+# VeriRespond — HackIndia 2026 (Pyrrhic Commit)
 
-**Project:** VeriRespond — evidence-grounded, policy-constrained AI incident response  
+**Repository:** `HackIndiaXYZ/hackindia-ai-cybertech-hackathon-2026-pyrrhic-commit`  
 **Team:** Pyrrhic Commit — Mohd Asif and Chirag Vishnoi  
 **Event context:** HackIndia AI & CyberTech Hackathon 2026  
-**Status:** Build specification; implementation and test claims must be updated only after they are actually verified.
+**Track:** AI & CyberTech — Zero-Knowledge Evidence & Incident Containment  
+**Status:** Locally verified end-to-end implementation and luxury white React dashboard.
+
+---
 
 ## Read these documents in this order
 
@@ -11,14 +14,16 @@
 2. `ARCHITECTURE_AND_THREAT_MODEL.md` — components, trust boundaries, threats and security claims.
 3. `PROTOCOL_AND_CONTRACTS.md` — frozen action IDs, FSM, receipt format, hash chain and proof binding.
 4. `TEAM_EXECUTION.md` — file ownership, branch rules, integration gates and time-boxed plan.
-5. `TEST_AND_DEMO_RUNBOOK.md` — tests, commands to fill in once scripts exist, demo flow and judge-safe claims.
+5. `TEST_AND_DEMO_RUNBOOK.md` — tests, commands, demo flow and judge-safe claims.
 6. `AGENTS.md` — mandatory instructions for Antigravity agents.
 
-These six documents are the source of truth. If a code implementation conflicts with them, do not silently change the docs or contracts: raise the mismatch, explain the impact, and agree a decision before proceeding.
+---
 
 ## One-minute product definition
 
-VeriRespond demonstrates a constrained security-response workflow. A planner proposes typed actions. A deterministic policy gate validates the target, action, incident, and state transition. A separate controlled executor performs only approved simulated actions in an isolated mock environment. The trusted executor emits signed receipts; receipts are chained with SHA-256. A Circom/snarkjs circuit proves that the canonical four-action sequence satisfies the versioned FSM and is bound to a public Poseidon commitment. An independent verifier checks receipt signatures, chain integrity, the commitment, and the ZK proof. The dashboard reports each check separately.
+VeriRespond demonstrates a constrained security-response workflow. A planner proposes typed actions. A deterministic policy gate validates the target, action, incident, and state transition. A separate controlled executor performs only approved simulated actions in an isolated mock environment. The trusted executor emits signed receipts; receipts are chained with SHA-256. A Circom/snarkjs circuit proves that the canonical four-action sequence satisfies the versioned FSM and is bound to a public Poseidon commitment. An independent verifier checks receipt signatures, chain integrity, the commitment, and the ZK proof. The luxury executive dashboard reports each check separately.
+
+---
 
 ## Non-negotiable honesty rules
 
