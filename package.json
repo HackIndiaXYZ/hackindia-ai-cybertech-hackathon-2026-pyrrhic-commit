@@ -4,6 +4,9 @@
   "description": "**Project:** VeriRespond — evidence-grounded, policy-constrained AI incident response  \r **Team:** Pyrrhic Commit — Mohd Asif and Chirag Vishnoi  \r **Event context:** HackIndia AI & CyberTech Hackathon 2026  \r **Status:** Build specification; implementation and test claims must be updated only after they are actually verified.",
   "main": "index.js",
   "scripts": {
+    "start": "node src/server.js",
+    "build:frontend": "npm --prefix frontend run build",
+    "dev:frontend": "npm --prefix frontend run dev",
     "test": "node tests/crypto.test.js && node tests/zk.test.js && node tests/e2e_verification.test.js",
     "test:crypto": "node tests/crypto.test.js",
     "test:zk": "node tests/zk.test.js",

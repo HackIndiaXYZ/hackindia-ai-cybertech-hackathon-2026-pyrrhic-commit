@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VeriRespond — Evidence-Grounded AI Incident Response</title>
+  <meta name="description" content="Zero-knowledge proven, policy-constrained incident response engine for HackIndia 2026. Independent verification of state transitions, Ed25519 receipt chains, and Groth16 proofs.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Navigation / Header -->
+    <header class="app-header">
+      <div class="header-branding">
+        <div class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">VERIRESPOND <span class="tag-fsm">FSM-V1</span></div>
+          <div class="brand-subtitle">Cryptographic Evidence & ZK Incident Containment Engine</div>
+        </div>
+      </div>
+
+      <div class="system-meta">
+        <div class="meta-item">
+          <span class="meta-label">CIRCUIT MANIFEST:</span>
+          <span class="meta-value mono" id="meta-manifest-hash">Computing...</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">VERIFIER VKEY:</span>
+          <span class="meta-value mono" id="meta-vkey-hash">Computing...</span>
+        </div>
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span id="system-status-text">SYSTEM OPERATIONAL</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="dashboard-grid">
+      
+      <!-- Left Column: Controls, Scenarios, and Verification Gates -->
+      <section class="panel panel-left">
+        <div class="panel-header">
+          <h2>Simulation & Scenarios</h2>
+          <span class="badge badge-neutral">Autonomous Engine</span>
+        </div>
+        <p class="panel-desc">
+          Trigger legitimate incident containment workflows or inject adversarial faults to evaluate deterministic policy guardrails and zero-knowledge proof verification.
+        </p>
+
+        <!-- Scenario Selector Grid -->
+        <div class="scenario-buttons-grid">
+          <button class="btn btn-scenario active" id="btn-happy-path" onclick="runScenario('happy_path')">
+            <div class="btn-scenario-title">
+              <span class="dot-icon dot-green"></span>
+              <strong>1. Happy Path</strong>
+            </div>
+            <div class="btn-scenario-desc">Valid 4-step sequence (FSM 0→4). Proof & chain pass.</div>
+          </button>
+
+          <button class="btn btn-scenario" id="btn-policy-denial" onclick="runScenario('policy_denial')">
+            <div class="btn-scenario-title">
+              <span class="dot-icon dot-amber"></span>
+              <strong>2. Policy Gate Denial</strong>
+            </div>
+            <div class="btn-scenario-desc">Out-of-order action proposed; blocked before execution.</div>
+          </button>
+
+          <button class="btn btn-scenario" id="btn-tampered-receipt" onclick="runScenario('tampered_receipt')">
+            <div class="btn-scenario-title">
+              <span class="dot-icon dot-red"></span>
+              <strong>3. Tampered Receipt</strong>
+            </div>
+            <div class="btn-scenario-desc">Adversary modifies signed target; signature & chain fail.</div>
+          </button>
+
+          <button class="btn btn-scenario" id="btn-broken-chain" onclick="runScenario('broken_chain')">
+            <div class="btn-scenario-title">
+              <span class="dot-icon dot-red"></span>
+              <strong>4. Broken Hash Chain</strong>
+            </div>
+            <div class="btn-scenario-desc">Step 3 deleted; chain linkage & commitment fail.</div>
+          </button>
+
+          <button class="btn btn-scenario" id="btn-replay-attack" onclick="runScenario('replay_attack')">
+            <div class="btn-scenario-title">
+              <span class="dot-icon dot-purple"></span>
+              <strong>5. Cross-Run Replay</strong>
+            </div>
+            <div class="btn-scenario-desc">Foreign proof paired with receipts; binding check fails.</div>
+          </button>
+
+          <button class="btn btn-scenario" id="btn-tampered-proof" onclick="runScenario('tampered_proof')">
+            <div class="btn-scenario-title">
+              <span class="dot-icon dot-red"></span>
+              <strong>6. Tampered Proof Signal</strong>
+            </div>
+            <div class="btn-scenario-desc">Poseidon commitment altered; ZK verification fails.</div>
+          </button>
+        </div>
+
+        <div class="action-bar">
+          <button class="btn btn-primary" id="btn-rerun" onclick="rerunCurrentScenario()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            <span id="btn-rerun-text">Run Selected Scenario</span>
+          </button>
+          <button class="btn btn-secondary" onclick="openRawModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 18 22 12 16 6"/>
+              <polyline points="8 6 2 12 8 18"/>
+            </svg>
+            View Verifier JSON
+          </button>
+        </div>
+
+        <!-- Section: 7 Verification Gates -->
+        <div class="gates-section">
+          <div class="gates-header">
+            <h3>Independent Verification Gates</h3>
+            <span class="help-tooltip" title="Each gate is computed independently. No single combined badge is allowed.">ℹ️ 7 Distinct Checks</span>
+          </div>
+
+          <div class="gates-list">
+            <div class="gate-card" id="gate-policy">
+              <div class="gate-info">
+                <div class="gate-name">1. POLICY GATE</div>
+                <div class="gate-desc">Runtime FSM transition & authorized target validation</div>
+              </div>
+              <div class="gate-status status-not-run" id="status-policy">NOT_RUN</div>
+            </div>
+
+            <div class="gate-card" id="gate-execution">
+              <div class="gate-info">
+                <div class="gate-name">2. SIMULATED EXECUTION</div>
+                <div class="gate-desc">Safe local mock environment state mutation</div>
+              </div>
+              <div class="gate-status status-not-run" id="status-execution">NOT_RUN</div>
+            </div>
+
+            <div class="gate-card" id="gate-signatures">
+              <div class="gate-info">
+                <div class="gate-name">3. RECEIPT SIGNATURES</div>
+                <div class="gate-desc">Ed25519 signature verified for each action receipt</div>
+              </div>
+              <div class="gate-status status-not-run" id="status-signatures">NOT_RUN</div>
+            </div>
+
+            <div class="gate-card" id="gate-chain">
+              <div class="gate-info">
+                <div class="gate-name">4. HASH CHAIN INTEGRITY</div>
+                <div class="gate-desc">SHA-256 backward chain links & monotonic sequence</div>
+              </div>
+              <div class="gate-status status-not-run" id="status-chain">NOT_RUN</div>
+            </div>
+
+            <div class="gate-card" id="gate-binding">
+              <div class="gate-info">
+                <div class="gate-name">5. COMMITMENT BINDING</div>
+                <div class="gate-desc">Poseidon(5) hash over receipts matches proof public input</div>
+              </div>
+              <div class="gate-status status-not-run" id="status-binding">NOT_RUN</div>
+            </div>
+
+            <div class="gate-card" id="gate-proof-gen">
+              <div class="gate-info">
+                <div class="gate-name">6. ZK PROOF GENERATION</div>
+                <div class="gate-desc">Groth16 prover execution on Circom circuit fsm_v1</div>
+              </div>
+              <div class="gate-status status-not-run" id="status-proof-gen">NOT_RUN</div>
+            </div>
+
+            <div class="gate-card" id="gate-zk-verify">
+              <div class="gate-info">
+                <div class="gate-name">7. INDEPENDENT ZK VERIFICATION</div>
+                <div class="gate-desc">Snarkjs pairing check against pinned verification key</div>
+              </div>
+              <div class="gate-status status-not-run" id="status-zk-verify">NOT_RUN</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Live Telemetry, FSM Pipeline, Receipts & Proof -->
+      <section class="panel panel-right">
+        
+        <!-- Live Execution Banner -->
+        <div class="execution-summary-banner" id="execution-summary-banner">
+          <div class="summary-icon" id="summary-icon">⚡</div>
+          <div class="summary-details">
+            <div class="summary-title" id="summary-title">Ready for Execution</div>
+            <div class="summary-subtitle" id="summary-subtitle">Select a scenario to start simulation and independent verification.</div>
+          </div>
+          <div class="summary-run-id">
+            <span class="mono" id="current-run-id">RUN_ID: —</span>
+          </div>
+        </div>
+
+        <!-- FSM State Pipeline Visualizer -->
+        <div class="sub-panel">
+          <div class="sub-panel-title">
+            <span>Incident Containment State Machine</span>
+            <span class="state-version">v1.0 (Strict Transition)</span>
+          </div>
+          
+          <div class="fsm-stepper" id="fsm-stepper">
+            <div class="fsm-step" id="step-node-0">
+              <div class="step-circle">0</div>
+              <div class="step-label">DETECTED</div>
+              <div class="step-action">Start</div>
+            </div>
+            <div class="fsm-arrow">→</div>
+            <div class="fsm-step" id="step-node-1">
+              <div class="step-circle">1</div>
+              <div class="step-label">IP_BLOCKED</div>
+              <div class="step-action">BLOCK_IP</div>
+            </div>
+            <div class="fsm-arrow">→</div>
+            <div class="fsm-step" id="step-node-2">
+              <div class="step-circle">2</div>
+              <div class="step-label">REVOKED</div>
+              <div class="step-action">ROTATE_CRED</div>
+            </div>
+            <div class="fsm-arrow">→</div>
+            <div class="fsm-step" id="step-node-3">
+              <div class="step-circle">3</div>
+              <div class="step-label">ISOLATED</div>
+              <div class="step-action">ISOLATE_SVC</div>
+            </div>
+            <div class="fsm-arrow">→</div>
+            <div class="fsm-step" id="step-node-4">
+              <div class="step-circle">4</div>
+              <div class="step-label">CONTAINED</div>
+              <div class="step-action">CONFIRM</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cryptographic Receipts & Hash Chain -->
+        <div class="sub-panel">
+          <div class="sub-panel-title">
+            <span>Cryptographic Receipt Hash Chain</span>
+            <span class="chain-badge" id="receipt-count-badge">0 Receipts</span>
+          </div>
+          <div class="receipts-flow" id="receipts-container">
+            <div class="empty-state">No receipts emitted yet. Run a scenario above.</div>
+          </div>
+        </div>
+
+        <!-- ZK Commitment & Proof Inspector -->
+        <div class="sub-panel">
+          <div class="sub-panel-title">
+            <span>Zero-Knowledge Poseidon Commitment & Proof Inspector</span>
+            <span class="state-version">Groth16 / BN128</span>
+          </div>
+
+          <div class="zk-inspector-grid">
+            <div class="zk-card">
+              <div class="zk-label">Poseidon(5) Recomputed Commitment:</div>
+              <div class="zk-value mono" id="zk-computed-comm">—</div>
+              <div class="zk-sub">Calculated independently by verifier from receipt sequence</div>
+            </div>
+
+            <div class="zk-card">
+              <div class="zk-label">Proof Public Signal [1] (Bound Commitment):</div>
+              <div class="zk-value mono" id="zk-public-signal">—</div>
+              <div class="zk-sub">Committed inside arithmetic circuit during prover run</div>
+            </div>
+
+            <div class="zk-card full-width">
+              <div class="zk-label">Groth16 Curve Points:</div>
+              <div class="zk-value-small mono" id="zk-proof-points">π_A, π_B, π_C not generated yet</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Terminal / Audit Log -->
+        <div class="sub-panel">
+          <div class="sub-panel-title">
+            <span>Live Audit Console</span>
+            <button class="btn-text" onclick="clearLogs()">Clear</button>
+          </div>
+          <div class="console-box" id="audit-log">
+            <div class="log-line log-system">[INIT] VeriRespond UI initialized. Ready to execute scenarios.</div>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- Raw Data Modal -->
+    <div class="modal-overlay" id="raw-modal" onclick="closeRawModal(event)">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Independent Verifier Report & Cryptographic Payload</h3>
+          <button class="modal-close" onclick="closeRawModal()">✕</button>
+        </div>
+        <div class="modal-tabs">
+          <button class="modal-tab active" onclick="switchModalTab('report')">Verifier Report</button>
+          <button class="modal-tab" onclick="switchModalTab('receipts')">Receipts JSON</button>
+          <button class="modal-tab" onclick="switchModalTab('proof')">Proof Data</button>
+        </div>
+        <div class="modal-body">
+          <pre class="json-viewer" id="modal-json-content">// Select a tab to view JSON data</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div>VeriRespond MVP — Team Pyrrhic Commit (HackIndia 2026)</div>
+      <div class="footer-note">All verification checks are strictly computed at runtime; no results are simulated or hardcoded.</div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
