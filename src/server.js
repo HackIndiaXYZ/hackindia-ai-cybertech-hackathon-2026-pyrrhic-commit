@@ -62,7 +62,7 @@ function parseJsonBody(req) {
   });
 }
 
-const server = http.createServer(async (req, res) => {
+const requestHandler = async (req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathname = parsedUrl.pathname;
 
@@ -130,6 +130,19 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  // --- Favicon Safe Handling ---
+  if (pathname === '/favicon.ico' || pathname === '/favicon.png') {
+    const icoPath = path.join(STATIC_DIR, pathname.slice(1));
+    if (fs.existsSync(icoPath)) {
+      const ext = path.extname(icoPath).toLowerCase();
+      res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] || 'image/x-icon' });
+      return fs.createReadStream(icoPath).pipe(res);
+    }
+    // Return empty 204 if missing to prevent 500 error on Vercel
+    res.writeHead(204);
+    return res.end();
+  }
+
   // --- Static Files Serving ---
   let filePath = path.join(STATIC_DIR, pathname === '/' ? 'index.html' : pathname);
 
@@ -159,10 +172,23 @@ const server = http.createServer(async (req, res) => {
       res.end(content);
     });
   });
-});
+};
+
+const server = http.createServer(requestHandler);
+
+// Serverless-ready wrapper function that works as both a request handler and an http.Server
+function handler(req, res) {
+  return requestHandler(req, res);
+}
+
+handler.listen = (...args) => server.listen(...args);
+handler.close = (...args) => server.close(...args);
+handler.on = (...args) => server.on(...args);
+handler.server = server;
+handler.requestHandler = requestHandler;
 
 if (require.main === module) {
-  server.listen(PORT, () => {
+  handler.listen(PORT, () => {
     console.log(`\n======================================================`);
     console.log(`  VeriRespond Security & ZK Dashboard Server Running`);
     console.log(`  URL: http://localhost:${PORT}`);
@@ -171,4 +197,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = server;
+module.exports = handler;

@@ -1,6 +1,5 @@
-# Ignore root server & circuit files for Vercel static deployment
-index.js
-src/
-circuits/
+# Ignore development and test files
 tests/
 scripts/
+circuits/fsm_v1.circom
+circuits/scripts/

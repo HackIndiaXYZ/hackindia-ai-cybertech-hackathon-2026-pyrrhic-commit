@@ -2,7 +2,7 @@
   "name": "verirespond-hackindia-2026",
   "version": "1.0.0",
   "description": "**Project:** VeriRespond — evidence-grounded, policy-constrained AI incident response  \r **Team:** Pyrrhic Commit — Mohd Asif and Chirag Vishnoi  \r **Event context:** HackIndia AI & CyberTech Hackathon 2026  \r **Status:** Build specification; implementation and test claims must be updated only after they are actually verified.",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
     "dev": "node src/server.js",

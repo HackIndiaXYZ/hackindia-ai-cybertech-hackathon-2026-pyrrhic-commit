@@ -9,9 +9,10 @@
  * - Presentation layer consumes only raw verifier reports.
  */
 
+const fs = require('fs');
 const { generateKeyPair, signReceipt } = require('../crypto/evidence');
 const { computeSequenceCommitment } = require('../zk/poseidon');
-const { generateFsmProof } = require('../zk/prover');
+const { generateFsmProof, DEFAULT_WASM_PATH } = require('../zk/prover');
 const { verifyResponse, getFileHash, DEFAULT_MANIFEST_PATH } = require('../zk/verifier');
 
 // Frozen FSM transitions according to PROTOCOL_AND_CONTRACTS.md
@@ -35,7 +36,20 @@ let mockAuthorityKeypair = null;
 
 function getAuthorityKeypair() {
   if (!mockAuthorityKeypair) {
-    mockAuthorityKeypair = generateKeyPair();
+    if (process.env.SIGNING_KEY) {
+      try {
+        const crypto = require('crypto');
+        const privateKeyPem = process.env.SIGNING_KEY.replace(/\\n/g, '\n');
+        const pub = crypto.createPublicKey(privateKeyPem);
+        const publicKeyPem = pub.export({ type: 'spki', format: 'pem' });
+        mockAuthorityKeypair = { privateKeyPem, publicKeyPem };
+      } catch (e) {
+        console.warn('Warning: Failed to parse SIGNING_KEY from env, generating fallback keypair:', e.message);
+        mockAuthorityKeypair = generateKeyPair();
+      }
+    } else {
+      mockAuthorityKeypair = generateKeyPair();
+    }
   }
   return mockAuthorityKeypair;
 }
@@ -80,7 +94,8 @@ function evaluatePolicyGate(currentState, actionCode, targetId) {
  */
 async function executeScenario(scenarioType = 'happy_path', customParams = {}) {
   const keys = getAuthorityKeypair();
-  const runId = customParams.runId || `${Date.now()}`;
+  const isBinaryPresent = fs.existsSync(DEFAULT_WASM_PATH);
+  const runId = customParams.runId || (isBinaryPresent ? `${Date.now()}` : '10000000000000000001');
   const incidentId = 'INC-DEMO-001';
 
   const logs = [];

@@ -10,6 +10,7 @@ yarn-error.log*
 *.zkey
 !circuits/artifacts/*.vkey.json
 !circuits/artifacts/manifest.json
+!circuits/artifacts/prepared_proof.json
 circuits/artifacts/*.zkey
 circuits/artifacts/*.ptau
 circuits/build/
