@@ -1,0 +1,195 @@
+:root {
+  /* ═══ PREMIUM LIGHT PALETTE ═══ */
+  /* Warm ivories instead of cold grays */
+  --bg-page: #F7F6F3;
+  --bg-card: #FFFFFF;
+  --bg-panel: #FAFAF8;
+  --bg-hover: #F3F2EF;
+  --bg-sunken: #F0EFEC;
+
+  /* Ink — deep charcoal, not pure black */
+  --text-ink: #1B1F27;
+  --text-secondary: #464D5A;
+  --text-muted: #78818E;
+  --text-faint: #A0A7B4;
+
+  /* Premium borders — warm sand tones */
+  --border-hairline: #E8E6E1;
+  --border-strong: #D4D1CB;
+  --border-focus: #1C2B4A;
+  --border-card: rgba(0, 0, 0, 0.06);
+
+  /* Deep Navy Primary */
+  --primary: #1C2B4A;
+  --primary-hover: #0F1D35;
+  --primary-tint: #EDF0F7;
+  --primary-soft: #D8DEE9;
+
+  /* Champagne Accent (premium gold) */
+  --brass: #8C6D2E;
+  --brass-hover: #7A5F27;
+  --brass-tint: #F8F1E4;
+  --brass-border: #E6D9BF;
+  --brass-glow: rgba(140, 109, 46, 0.08);
+
+  /* Status — softer, more editorial */
+  --status-pass-text: #1A7A4C;
+  --status-pass-bg: #EBF7F1;
+  --status-pass-border: #C5E8D4;
+  --status-pass-glow: rgba(26, 122, 76, 0.06);
+
+  --status-fail-text: #B5302A;
+  --status-fail-bg: #FDF0EF;
+  --status-fail-border: #F5CAC7;
+  --status-fail-glow: rgba(181, 48, 42, 0.06);
+
+  --status-denied-text: #8B5E14;
+  --status-denied-bg: #FFF7EA;
+  --status-denied-border: #F2DFBA;
+
+  --status-notrun-text: #6B7280;
+  --status-notrun-bg: #F3F4F6;
+  --status-notrun-border: #E0E2E7;
+
+  /* Typography */
+  --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Figtree', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, Consolas, monospace;
+
+  /* Premium Radii */
+  --radius-pill: 9999px;
+  --radius-card: 18px;
+  --radius-inner: 12px;
+  --radius-btn: 12px;
+  --radius-sm: 7px;
+  --radius-xs: 5px;
+
+  /* Luxury Shadows — layered for depth */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.03), 0 4px 16px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 2px 4px rgba(0, 0, 0, 0.04), 0 8px 28px rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-inner: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.14), 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-glow-pass: 0 0 0 3px rgba(26, 122, 76, 0.08);
+  --shadow-glow-fail: 0 0 0 3px rgba(181, 48, 42, 0.08);
+  --shadow-glow-primary: 0 0 0 3px rgba(28, 43, 74, 0.1);
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Transition */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur-normal: 220ms;
+  --dur-slow: 350ms;
+}
+
+/* ═══ GLOBAL RESETS ═══ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-page);
+  color: var(--text-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.55;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+/* Accessibility Focus */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* Typography Utility */
+.font-serif { font-family: var(--font-serif); }
+.mono { font-family: var(--font-mono); }
+
+/* Premium Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Animations */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "1",
+  "policy_version": "fsm-v1",
+  "description": "VeriRespond FSM v1 Groth16 Setup Manifest",
+  "toolchain": {
+    "circom": "2.2.3",
+    "snarkjs": "0.7.5",
+    "circomlib": "2.0.5",
+    "circomlibjs": "0.1.7"
+  },
+  "artifacts": {
+    "circuit_source": {
+      "path": "circuits/fsm_v1.circom",
+      "sha256": "c73a1b4543da42a07087f62ac2a3ac0a99b31faa6c5cf20985f732c5c993f965"
+    },
+    "r1cs": {
+      "path": "circuits/build/fsm_v1.r1cs",
+      "sha256": "687d640402ea709e0afd7ddb8f45fde12d00c2e786a903de0a8a8e2afe485ef5"
+    },
+    "wasm": {
+      "path": "circuits/build/fsm_v1_js/fsm_v1.wasm",
+      "sha256": "bd28996325a9f00e133935f48763c69568b3c9a644c4fce7ccb0826f7e627b6c"
+    },
+    "verification_key": {
+      "path": "circuits/artifacts/fsm_v1.vkey.json",
+      "sha256": "146c00260330dcba21775c669a3b3778fa5c40b5ab92d62c5d4237cb4de7ad34"
+    },
+    "zkey_final": {
+      "path": "circuits/artifacts/fsm_v1_final.zkey",
+      "sha256": "e7106aee9e2bfbb6cd407107aeae6bd5c8fba308fe01193a9e0b5af9642eb74e"
+    }
+  },
+  "timestamp": "2026-10-28T04:59:50.525Z",
+  "demo_notice": "Generated for HackIndia 2026 hackathon demo/testing. Not a production trusted ceremony."
+}
