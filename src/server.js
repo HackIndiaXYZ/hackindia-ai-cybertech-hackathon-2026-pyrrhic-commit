@@ -77,6 +77,15 @@ const requestHandler = async (req, res) => {
     return;
   }
 
+  // --- Health Check Endpoint ---
+  if ((pathname === '/api/health' || pathname === '/health') && req.method === 'GET') {
+    return sendJson(res, 200, {
+      status: 'healthy',
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString()
+    });
+  }
+
   // --- API Endpoints ---
   if (pathname === '/api/status' && req.method === 'GET') {
     const manifestHash = getFileHash(DEFAULT_MANIFEST_PATH);
